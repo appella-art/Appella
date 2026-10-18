@@ -1,0 +1,139 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>App'Ella</title>
+<style>
+:root{--bg:#faf6ee;--ink:#2f3a2e;--mut:#7a7365;--pl:#5a7a56;--on:#fff;--ln:#e6dcc8;--card:#fff;--gold:#c29a3f;--y:#f2c230;--sage:#6f8f6b}
+@media(prefers-color-scheme:dark){:root{--bg:#1b211b;--ink:#f3efe4;--mut:#a8a596;--pl:#9dbb97;--on:#1b211b;--ln:#2f382f;--card:#232b23;--gold:#d9b25a;--sage:#6f8f6b}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,sans-serif;padding:env(safe-area-inset-top) 0 90px}
+main{max-width:560px;margin:auto;padding:12px 16px}header{display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;margin:6px 0}.lg{width:36px;height:36px;border-radius:50%;background:var(--sage);color:#fff;display:grid;place-items:center;font-weight:700;font-size:1.1rem;box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--y)}.nm{font-weight:700;font-size:1.5rem;color:var(--pl)}.nm i{color:var(--y);font-style:normal}
+h2,h3{margin:14px 0 8px}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:12px;margin:10px 0}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.g2 .card{margin:0}
+.big{background:var(--sage);border-color:var(--sage);color:#fff;display:flex;align-items:center;gap:12px;cursor:pointer}.big .mut{color:#eaf1e8}
+.gold{color:var(--gold);font-weight:600;font-size:.85rem}
+input,select,textarea{width:100%;padding:10px;margin:4px 0 8px;border:1px solid var(--ln);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+label{display:block;font-size:.9rem;color:var(--mut)}label.row{display:flex;gap:8px;align-items:center}label.row input{width:auto;margin:0}
+button{padding:10px 14px;border:0;border-radius:8px;background:var(--pl);color:var(--on);font:600 1rem system-ui;margin:2px 6px 2px 0}
+button.alt{background:none;color:var(--pl);border:1px solid var(--pl)}button.link{background:none;color:var(--pl);padding:6px 0}
+.mut{color:var(--mut)}.chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0}.chip{background:none;color:var(--ink);border:1px solid var(--ln);white-space:nowrap;border-radius:99px}.chip.on{background:var(--pl);color:var(--on);border-color:var(--pl)}
+.tag{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.85rem;border:1px solid var(--ln)}.confirme{color:#2e7d5b;border-color:#2e7d5b}.refuse,.annule{color:#b3392f;border-color:#b3392f}
+nav{position:fixed;bottom:0;left:0;right:0;display:none;background:var(--card);border-top:1px solid var(--ln);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+nav button{flex:1;background:none;color:var(--mut);margin:0;padding:10px 4px;font-size:.9rem}nav button.on{color:var(--pl);box-shadow:inset 0 -3px 0 var(--y)}
+#t{position:fixed;left:16px;right:16px;bottom:80px;background:var(--ink);color:var(--bg);padding:12px;border-radius:10px}
+.ic{flex:none;width:42px;height:42px;border-radius:50%;background:var(--y);color:#2f3a2e;display:grid;place-items:center;font-weight:700;font-size:1.1rem}
+.it{display:flex;gap:12px;align-items:center;cursor:pointer}.it .mut{font-size:.9rem}
+.tg{display:inline-block;background:var(--y);color:#2f3a2e;border-radius:99px;padding:2px 10px;font-size:.8rem;font-weight:600;margin-bottom:4px}
+.d{border-top:4px solid var(--gold)}.d.s{border-top-color:var(--sage)}
+ul.l,ol.l{margin:6px 0 10px;padding-left:20px}ul.l li,ol.l li{margin:4px 0}
+.ph{position:relative;flex:none;overflow:hidden;background:var(--y);color:#2f3a2e;display:grid;place-items:center;font-weight:700;font-size:1.3rem;width:56px;height:56px;border-radius:12px}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ph.w{width:100%;height:90px;border-radius:8px;margin-bottom:8px}
+.ph.b{width:100%;height:190px;border-radius:12px;margin:8px 0;font-size:2rem}
+</style></head><body>
+<main><header><div class="logo" onclick="user&&go('accueil')"><span class="lg">A</span><span class="nm">App<i>'</i>Ella</span></div><button id="out" class="link" style="display:none" onclick="sb.auth.signOut()">Quitter</button></header><div id="v"></div></main>
+<nav id="nav"><button data-t="accueil" onclick="go('accueil')">Accueil</button><button data-t="explorer" onclick="go('explorer')">Explorer</button><button data-t="rdv" onclick="go('rdv')">Mes RDV</button><button data-t="pro" onclick="go('pro')">Espace pro</button></nav>
+<div id="t" hidden></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+const URL_SB='https://ncghgiookwiozfhizmxk.supabase.co',KEY_SB='sb_publishable_tVqFzQWSqCG3p15iY-IpxA_AlYMXWlt';
+const sb=supabase.createClient(URL_SB,KEY_SB),$=s=>document.querySelector(s);
+const CATS=['Coiffure','Onglerie','Esthétique','Massage et spa','Yoga'];
+const ST={en_attente:'En attente',confirme:'Confirmé',refuse:'Refusé',annule:'Annulé',termine:'Terminé'};
+const PLATS=[
+{n:'Romazava',f:'romazava.jpg',t:'1 h 30',i:['500 g de bœuf en morceaux','2 bottes de brèdes (mafana, morelle ou épinards)','1 oignon, 2 tomates','Gingembre, 2 gousses d’ail','Sel et huile'],s:['Fais dorer la viande dans l’huile avec l’oignon, l’ail et le gingembre.','Ajoute les tomates, couvre d’eau et laisse mijoter 1 h à 1 h 15 jusqu’à ce que la viande soit tendre.','Ajoute les brèdes lavées et cuis encore 10 minutes.','Sale, puis sers avec du riz blanc.']},
+{n:'Ravitoto sy henakisoa',f:'ravitoto.jpg',t:'2 h 30',i:['500 g de feuilles de manioc pilées (ravitoto)','400 g de porc en morceaux','1 oignon, 3 gousses d’ail','Sel et huile','Lait de coco (facultatif)'],s:['Fais bouillir le ravitoto 30 à 45 minutes dans l’eau, puis égoutte-le.','Dore le porc avec l’oignon et l’ail.','Ajoute le ravitoto, couvre d’eau et laisse mijoter 1 h 30 à feu doux.','Ajoute le lait de coco si tu veux, sale et sers avec du riz.']},
+{n:'Vary amin’anana',f:'vary-anana.jpg',t:'40 min',i:['1 tasse de riz','4 tasses d’eau','2 poignées de brèdes mafana','1 oignon, 1 tomate','Gingembre et sel'],s:['Cuis le riz dans l’eau avec le gingembre pendant 20 minutes.','Ajoute l’oignon et la tomate coupés.','Ajoute les brèdes et cuis 10 minutes de plus.','Sale et sers chaud, avec un peu de viande ou de poisson si tu en as.']},
+{n:'Akoho sy voanio',f:'akoho-voanio.jpg',t:'1 h',i:['1 poulet découpé','400 ml de lait de coco','1 oignon, 2 tomates','3 gousses d’ail, gingembre','Sel et huile'],s:['Fais dorer le poulet dans l’huile.','Ajoute l’oignon, l’ail, le gingembre et les tomates.','Couvre d’eau et cuis 30 minutes.','Verse le lait de coco, laisse mijoter 15 à 20 minutes, puis sale.']},
+{n:'Lasopy',f:'lasopy.jpg',t:'45 min',i:['2 carottes, 2 pommes de terre','1 poireau, 1 oignon, un peu de chou','100 g de vermicelle (facultatif)','200 g de viande ou d’os (facultatif)','Sel et huile'],s:['Fais cuire la viande dans l’eau 20 minutes si tu en mets.','Ajoute les légumes coupés en morceaux.','Cuis 20 minutes, ajoute le vermicelle 5 minutes avant la fin.','Sale et sers bien chaud.']}];
+const TENUES=[
+{n:'Rendez-vous d’affaires',f:'look-affaires.jpg',o:'Travail, réunion',p:'Tailleur léger beige, chemisier vert sauge, chaussures nude',m:'Teint net, rouge à lèvres rosé, mascara',c:'Ajoute un bijou doré discret pour une touche élégante.'},
+{n:'Journée décontractée',f:'look-decontracte.jpg',o:'Courses, sorties',p:'Jean droit, top blanc, baskets claires',m:'Crème teintée, baume à lèvres, un peu de mascara',c:'Un foulard jaune au sac donne de la couleur sans effort.'},
+{n:'Soirée entre amies',f:'look-soiree.jpg',o:'Dîner, fête',p:'Robe fluide, sandales dorées, boucles d’oreilles',m:'Eye-liner fin, highlighter, lèvres corail',c:'Choisis un seul élément brillant pour garder l’équilibre.'},
+{n:'Style malgache du jour',f:'look-malgache.jpg',o:'Marché, famille',p:'Lamba sur une robe simple, sandales plates',m:'Teint frais, lèvres naturelles',c:'Choisis un lamba aux couleurs douces pour un beau rendu.'},
+{n:'Cérémonie',f:'look-ceremonie.jpg',o:'Mariage, fête de famille',p:'Ensemble en lin beige ou robe longue sauge',m:'Teint lumineux, yeux dorés, lèvres rose nude',c:'Prépare ta tenue la veille pour être sereine le jour J.'}];
+const SOON={boutique:['Boutique beauté','Soins, vernis et accessoires de prestataires de ta ville, bientôt ici.'],consult:['Consultation en ligne','Parle à des professionnels de santé sans te déplacer. Cette section arrive bientôt.'],actus:['Actus','Les actus pour les femmes actives arrivent bientôt.'],ebooks:['E-books','Une bibliothèque de livres pour te former et te détendre arrive bientôt.']};
+let user=null,tab='accueil',cat='Tous';
+const ar=n=>Number(n).toLocaleString('fr-FR')+' Ar',fmt=s=>new Date(s).toLocaleString('fr-FR',{dateStyle:'medium',timeStyle:'short'});
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(m){const e=$('#t');e.textContent=m;e.hidden=false;clearTimeout(toast.i);toast.i=setTimeout(()=>e.hidden=true,4500)}
+async function run(q){const{data,error}=await q;if(error){toast(error.message);return null}return data??true}
+function go(t){tab=t;draw()}
+function draw(){
+ $('#nav').style.display=user?'flex':'none';$('#out').style.display=user?'block':'none';
+ if(!user)return authView();
+ const m={accueil,explorer,rdv,pro,sport,plats,looks};(m[tab]||(()=>soon(tab)))();
+ const main=['explorer','rdv','pro'].includes(tab)?tab:'accueil';
+ document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==main));
+}
+function pic(f,l,c=''){return `<div class="ph ${c}"><span>${l}</span><img src="${f}" alt="" loading="lazy" onerror="this.remove()"></div>`}
+function accueil(){
+ const d=Math.floor(Date.now()/864e5),p=PLATS[d%PLATS.length],t=TENUES[d%TENUES.length],pi=d%PLATS.length,ti=d%TENUES.length;
+ $('#v').innerHTML=`<p class="mut">Prends le temps pour l’essentiel.</p><h3>Idée du jour</h3><div class="g2"><div class="card d" onclick="go('plats')">${pic(p.f,p.n[0],'w')}<div class="gold">Plat du jour</div><b>${p.n}</b><div class="mut">${p.t} · Voir la recette</div></div><div class="card d s" onclick="go('looks')">${pic(t.f,t.n[0],'w')}<div class="gold">Look du jour</div><b>${t.n}</b><div class="mut">Voir la tenue</div></div></div>
+ <div class="card big" onclick="go('explorer')"><div><b>Prendre rendez-vous</b><div class="mut">Salons et prestataires, en salon ou à domicile</div></div></div>
+ <div class="card big" onclick="go('consult')"><div><b>Consultation en ligne</b><div class="mut">Parle à un pro de santé</div></div></div>
+ <div class="card" onclick="go('boutique')"><b>Boutique beauté</b><div class="mut">Soins, vernis, accessoires</div></div>
+ <h3>Pour toi</h3><div class="chips"><button class="chip" onclick="go('plats')">Plats</button><button class="chip" onclick="go('looks')">Looks</button><button class="chip" onclick="go('sport')">Sport</button><button class="chip" onclick="go('actus')">Actus</button><button class="chip" onclick="go('ebooks')">E-books</button></div>`;
+}
+function plats(){
+ const d=Math.floor(Date.now()/864e5)%PLATS.length;
+ $('#v').innerHTML=`<button class="link" onclick="go('accueil')">Retour</button><h2>Que cuisiner aujourd’hui ?</h2><p class="mut">Choisis un plat pour voir les ingrédients et la recette.</p>`+PLATS.map((p,i)=>`<div class="card it" onclick="platDetail(${i})">${pic(p.f,p.n[0])}<div>${i==d?'<span class="tg">Suggestion du jour</span><br>':''}<b>${p.n}</b><div class="mut">${p.t}</div></div></div>`).join('');
+}
+function platDetail(i){
+ const p=PLATS[i];
+ $('#v').innerHTML=`<button class="link" onclick="go('plats')">Retour aux plats</button>${pic(p.f,p.n[0],'b')}<h2>${p.n}</h2><span class="tag">${p.t}</span><div class="card d"><b>Ingrédients</b><ul class="l">${p.i.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="card d s"><b>Préparation</b><ol class="l">${p.s.map(x=>`<li>${x}</li>`).join('')}</ol></div>`;
+}
+function looks(){
+ const d=Math.floor(Date.now()/864e5)%TENUES.length;
+ $('#v').innerHTML=`<button class="link" onclick="go('accueil')">Retour</button><h2>Que porter aujourd’hui ?</h2><p class="mut">Choisis une occasion pour voir la tenue et le maquillage.</p>`+TENUES.map((t,i)=>`<div class="card it" onclick="lookDetail(${i})">${pic(t.f,t.n[0])}<div>${i==d?'<span class="tg">Look du jour</span><br>':''}<b>${t.n}</b><div class="mut">${t.o}</div></div></div>`).join('');
+}
+function lookDetail(i){
+ const t=TENUES[i];
+ $('#v').innerHTML=`<button class="link" onclick="go('looks')">Retour aux looks</button>${pic(t.f,t.n[0],'b')}<h2>${t.n}</h2><span class="tag">${t.o}</span><div class="card d"><b>La tenue</b><p>${t.p}</p></div><div class="card d s"><b>Le maquillage</b><p>${t.m}</p></div><div class="card"><b>Le conseil</b><p class="mut">${t.c}</p></div>`;
+}
+function sport(){
+ $('#v').innerHTML=`<button class="link" onclick="go('accueil')">Retour</button><h2>Sport</h2><p class="mut">Des mouvements simples, sans matériel, même avec peu de temps.</p><div class="card"><b>Réveil en 5 minutes</b><div class="mut">Étirements du dos et des épaules, 10 squats, 30 secondes de gainage.</div></div><div class="card"><b>Pause bureau</b><div class="mut">Rotations des poignets et du cou, 20 montées de genoux, respiration profonde.</div></div><div class="card"><b>Marche rapide</b><div class="mut">20 minutes après le repas pour garder de l’énergie.</div></div>`;
+}
+function soon(k){const s=SOON[k]||['Bientôt','Cette section arrive bientôt.'];$('#v').innerHTML=`<button class="link" onclick="go('accueil')">Retour</button><h2>${s[0]}</h2><div class="card"><span class="tag">Bientôt disponible</span><p>${s[1]}</p></div>`}
+function authView(){$('#v').innerHTML=`<p class="mut">Coiffure, ongles, soins, yoga : réserve en salon ou à domicile.</p><div class="card"><input id="nm" placeholder="Ton nom (pour créer un compte)"><input id="em" type="email" placeholder="Email"><input id="pw" type="password" placeholder="Mot de passe (6 caractères minimum)"><button onclick="auth(1)">Se connecter</button><button class="alt" onclick="auth(0)">Créer mon compte</button></div>`}
+async function auth(login){
+ const email=$('#em').value.trim(),password=$('#pw').value;
+ const r=login?await sb.auth.signInWithPassword({email,password}):await sb.auth.signUp({email,password,options:{data:{full_name:$('#nm').value.trim()}}});
+ if(r.error)return toast(r.error.message);
+ if(!login&&!r.data.session)toast('Compte créé. Confirme ton email, puis connecte-toi.');
+}
+async function explorer(){
+ let q=sb.from('providers').select('*').eq('approved',true);if(cat!='Tous')q=q.eq('category',cat);
+ const d=await run(q);if(!d)return;
+ $('#v').innerHTML=`<div class="chips">${['Tous',...CATS].map(c=>`<button class="chip ${c==cat?'on':''}" onclick="cat='${c}';explorer()">${c}</button>`).join('')}</div>`+(d.length?d.map(p=>`<div class="card" onclick="detail('${p.id}')"><b>${esc(p.name)}</b><div class="mut">${esc(p.category)}${p.quartier?', '+esc(p.quartier):''}</div><div class="mut">${[p.offers_salon&&'En salon',p.offers_home&&'À domicile'].filter(Boolean).join(' et ')}</div></div>`).join(''):'<p class="mut">Aucun prestataire pour le moment. Inscris le premier dans Espace pro.</p>');
+}
+async function detail(id){
+ const d=await run(sb.from('providers').select('*, services(*)').eq('id',id).single());if(!d)return;
+ const sv=d.services.filter(s=>s.active);
+ $('#v').innerHTML=`<button class="link" onclick="explorer()">Retour</button><h2>${esc(d.name)}</h2><p class="mut">${esc(d.description||'')}</p>`+(sv.length?`<div class="card"><label>Prestation<select id="sv">${sv.map(s=>`<option value="${s.id}">${esc(s.name)}, ${ar(s.price_ar)}, ${s.duration_min} min</option>`).join('')}</select></label><label>Date et heure<input id="dt" type="datetime-local"></label><label>Lieu<select id="pl">${d.offers_salon?'<option value="salon">En salon</option>':''}${d.offers_home?`<option value="domicile">À domicile (+${ar(d.home_fee_ar||0)})</option>`:''}</select></label><label>Quartier ou repère (domicile)<input id="ad"></label><label>Ton téléphone<input id="ph" type="tel"></label><button onclick="book('${d.id}')">Demander ce rendez-vous</button></div>`:'<p class="mut">Ce prestataire n’a pas encore publié de prestations.</p>');
+}
+async function book(pid){
+ const dt=$('#dt').value,ph=$('#ph').value.trim();if(!dt||!ph)return toast('Indique la date, l’heure et ton téléphone.');
+ const r=await run(sb.from('bookings').insert({client_id:user.id,provider_id:pid,service_id:$('#sv').value,starts_at:new Date(dt).toISOString(),place:$('#pl').value,address_hint:$('#ad').value.trim()||null,client_phone:ph}));
+ if(r){toast('Demande envoyée. Le prestataire doit la confirmer.');go('rdv')}
+}
+async function rdv(){
+ const d=await run(sb.from('bookings').select('*, services(name,price_ar), providers(name)').eq('client_id',user.id).order('starts_at',{ascending:false}));if(!d)return;
+ $('#v').innerHTML='<h2>Mes rendez-vous</h2>'+(d.length?d.map(b=>`<div class="card"><b>${esc(b.providers?.name)}</b><div>${esc(b.services?.name)}, ${ar(b.services?.price_ar||0)}</div><div class="mut">${fmt(b.starts_at)}, ${b.place=='salon'?'en salon':'à domicile'}</div><span class="tag ${b.status}">${ST[b.status]}</span></div>`).join(''):'<p class="mut">Aucun rendez-vous. Choisis un prestataire dans Explorer.</p>');
+}
+async function pro(){
+ const ps=await run(sb.from('providers').select('*, services(*)').eq('owner_id',user.id));if(!ps)return;
+ if(!ps.length)return $('#v').innerHTML=`<h2>Espace pro</h2><p class="mut">Inscris ton salon ou ton activité. Ta fiche sera visible après validation.</p><div class="card"><input id="pn" placeholder="Nom du salon ou de l’activité"><select id="pc">${CATS.map(c=>`<option>${c}</option>`).join('')}</select><input id="pq" placeholder="Quartier"><input id="pp" type="tel" placeholder="Téléphone"><label class="row"><input id="po" type="checkbox" checked> En salon</label><label class="row"><input id="pm" type="checkbox"> À domicile</label><input id="pf" type="number" placeholder="Frais de déplacement (Ar)"><textarea id="pd" placeholder="Présentation"></textarea><button onclick="mkProv()">Envoyer ma fiche</button></div>`;
+ const p=ps[0],bk=await run(sb.from('bookings').select('*, services(name)').eq('provider_id',p.id).order('starts_at'))||[];
+ $('#v').innerHTML=`<h2>${esc(p.name)}</h2><span class="tag ${p.approved?'confirme':'en_attente'}">${p.approved?'Fiche publiée':'En attente de validation'}</span><h3>Prestations</h3>`+(p.services.map(s=>`<div class="card">${esc(s.name)}, ${ar(s.price_ar)}, ${s.duration_min} min</div>`).join('')||'<p class="mut">Ajoute ta première prestation.</p>')+`<div class="card"><input id="sn" placeholder="Prestation (ex. Brushing)"><input id="sp" type="number" placeholder="Prix en Ariary"><input id="sd" type="number" placeholder="Durée en minutes"><button onclick="addSv('${p.id}')">Ajouter</button></div><h3>Demandes reçues</h3>`+(bk.map(b=>`<div class="card"><b>${fmt(b.starts_at)}</b><div>${esc(b.services?.name)}, ${b.place=='salon'?'en salon':'à domicile '+esc(b.address_hint||'')}</div><div class="mut">${esc(b.client_phone)}</div>${b.status=='en_attente'?`<button onclick="setSt('${b.id}','confirme')">Confirmer</button><button class="alt" onclick="setSt('${b.id}','refuse')">Refuser</button>`:`<span class="tag ${b.status}">${ST[b.status]}</span>`}</div>`).join('')||'<p class="mut">Aucune demande pour le moment.</p>');
+}
+async function mkProv(){
+ const n=$('#pn').value.trim();if(!n)return toast('Indique le nom.');
+ if(await run(sb.from('providers').insert({owner_id:user.id,name:n,category:$('#pc').value,quartier:$('#pq').value.trim(),phone:$('#pp').value.trim(),offers_salon:$('#po').checked,offers_home:$('#pm').checked,home_fee_ar:+$('#pf').value||0,description:$('#pd').value.trim()})))pro();
+}
+async function addSv(pid){
+ const n=$('#sn').value.trim(),p=+$('#sp').value,d=+$('#sd').value;if(!n||p<0||d<=0)return toast('Remplis le nom, le prix et la durée.');
+ if(await run(sb.from('services').insert({provider_id:pid,name:n,price_ar:p,duration_min:d})))pro();
+}
+async function setSt(id,s){if(await run(sb.from('bookings').update({status:s}).eq('id',id)))pro()}
+(async()=>{const{data:{session}}=await sb.auth.getSession();user=session?.user||null;draw();
+ sb.auth.onAuthStateChange((_,s)=>{if((s?.user?.id)!==(user?.id)){user=s?.user||null;tab='accueil';draw()}})})();
+</script></body></html>
